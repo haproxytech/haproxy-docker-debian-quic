@@ -64,6 +64,7 @@ RUN apt-get update && \
                             USE_TFO=1 USE_LINUX_TPROXY=1 USE_LUA=1 USE_GETADDRINFO=1 \
                             USE_PROMEX=1 USE_SLZ=1 \
                             SSL_INC=/opt/quictls/include SSL_LIB=/opt/quictls/lib USE_QUIC=1 \
+                            LDFLAGS="-L/opt/quictls/lib -Wl,-rpath,/opt/quictls/lib" \
                             all && \
     make -C /tmp/haproxy TARGET=linux-glibc install-bin install-man && \
     ln -s /usr/local/sbin/haproxy /usr/sbin/haproxy && \
