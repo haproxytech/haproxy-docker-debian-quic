@@ -8,7 +8,7 @@ RUN cd "${GOPATH}/src/github.com/haproxytech/dataplaneapi" && \
     git checkout "v${DATAPLANE_MINOR}" && \
     make build && cp build/dataplaneapi /dataplaneapi
 
-FROM debian:bullseye-slim AS openssl-builder
+FROM debian:bookworm-slim AS openssl-builder
 
 ENV OPENSSL_SHA256 4e23619f73688144f2cd808e9567504c3bf10cb67ad9551280530fd54ca913e1
 ENV OPENSSL_URL https://github.com/quictls/openssl/archive/refs/tags/OpenSSL_1_1_1t-quic1.tar.gz
@@ -27,7 +27,7 @@ RUN apt-get update && \
     make install && \
     rm -rf /tmp/openssl
 
-FROM debian:bullseye-slim
+FROM debian:bookworm-slim
 
 MAINTAINER Dinko Korunic <dkorunic@haproxy.com>
 
@@ -82,6 +82,9 @@ RUN apt-get update && \
     touch /usr/local/etc/haproxy/dataplaneapi.hcl && \
     chown "$HAPROXY_UID:$HAPROXY_GID" /usr/local/etc/haproxy/dataplaneapi.hcl && \
     echo "/opt/quictls/lib" > /etc/ld.so.conf.d/quictls.conf && \
+    mkdir -p /opt/quictls/ssl && \
+    rm -rf /opt/quictls/ssl/certs && \
+    ln -s /etc/ssl/certs /opt/quictls/ssl/certs && \
     ldconfig
 
 COPY haproxy.cfg /usr/local/etc/haproxy
