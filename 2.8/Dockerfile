@@ -79,8 +79,8 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     chmod +x /usr/local/bin/dataplaneapi && \
     ln -s /usr/local/bin/dataplaneapi /usr/bin/dataplaneapi && \
-    touch /usr/local/etc/haproxy/dataplaneapi.hcl && \
-    chown "$HAPROXY_UID:$HAPROXY_GID" /usr/local/etc/haproxy/dataplaneapi.hcl && \
+    touch /usr/local/etc/haproxy/dataplaneapi.yml && \
+    chown "$HAPROXY_UID:$HAPROXY_GID" /usr/local/etc/haproxy/dataplaneapi.yml && \
     echo "/opt/quictls/lib" > /etc/ld.so.conf.d/quictls.conf && \
     mkdir -p /opt/quictls/ssl && \
     rm -rf /opt/quictls/ssl/certs && \
