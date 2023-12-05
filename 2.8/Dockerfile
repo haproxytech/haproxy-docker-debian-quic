@@ -11,7 +11,7 @@ RUN cd "${GOPATH}/src/github.com/haproxytech/dataplaneapi" && \
 FROM debian:bookworm-slim AS openssl-builder
 
 ENV OPENSSL_SHA256 1651412ec136a693fcc84c77df664ca0dc0495eab2785afa2c7ba064a00fb1b6
-ENV OPENSSL_URL https://github.com/quictls/openssl/archive/refs/tags/openssl-3.1.2-quic1.tar.gz
+ENV OPENSSL_URL https://github.com/quictls/openssl/archive/refs/tags/openssl-3.1.4-quic1.tar.gz
 
 ENV DEBIAN_FRONTEND noninteractive
 
