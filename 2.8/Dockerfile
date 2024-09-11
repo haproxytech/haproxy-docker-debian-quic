@@ -1,17 +1,21 @@
 FROM golang:alpine3.20 AS dataplaneapi-builder
 
 ENV DATAPLANE_MINOR 3.0.0
+ENV DATAPLANE_V2_MINOR 2.9.6
 ENV DATAPLANE_URL https://github.com/haproxytech/dataplaneapi.git
 
 RUN apk add --no-cache ca-certificates git make && \
     git clone "${DATAPLANE_URL}" "${GOPATH}/src/github.com/haproxytech/dataplaneapi" && \
     cd "${GOPATH}/src/github.com/haproxytech/dataplaneapi" && \
     git checkout "v${DATAPLANE_MINOR}" && \
-    make build && cp build/dataplaneapi /dataplaneapi
+    make build && cp build/dataplaneapi /dataplaneapi && \
+    make clean && \
+    git checkout "v${DATAPLANE_V2_MINOR}" && \
+    make build && cp build/dataplaneapi /dataplaneapi-v2
 
 FROM debian:bookworm-slim AS openssl-builder
 
-ENV OPENSSL_URL https://github.com/quictls/openssl/archive/refs/tags/openssl-3.1.5-quic1.tar.gz
+ENV OPENSSL_URL https://github.com/quictls/openssl/archive/refs/tags/openssl-3.1.7-quic1.tar.gz
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -48,6 +52,7 @@ ENV HAPROXY_GID haproxy
 ENV DEBIAN_FRONTEND noninteractive
 
 COPY --from=dataplaneapi-builder /dataplaneapi /usr/local/bin/dataplaneapi
+COPY --from=dataplaneapi-builder /dataplaneapi-v2 /usr/local/bin/dataplaneapi-v2
 COPY --from=openssl-builder /opt/quictls /opt/quictls
 
 RUN apt-get update && \
@@ -80,6 +85,8 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     chmod +x /usr/local/bin/dataplaneapi && \
     ln -s /usr/local/bin/dataplaneapi /usr/bin/dataplaneapi && \
+    chmod +x /usr/local/bin/dataplaneapi-v2 && \
+    ln -s /usr/local/bin/dataplaneapi-v2 /usr/bin/dataplaneapi-v2 && \
     touch /usr/local/etc/haproxy/dataplaneapi.yml && \
     chown "$HAPROXY_UID:$HAPROXY_GID" /usr/local/etc/haproxy/dataplaneapi.yml && \
     echo "/opt/quictls/lib" > /etc/ld.so.conf.d/quictls.conf && \
